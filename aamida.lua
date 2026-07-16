@@ -6,6 +6,30 @@ local coreGui = game:GetService("CoreGui")
 
 local viewport = workspace.CurrentCamera.ViewportSize
 
+local FONT do
+	local getcustomasset = getcustomasset or getsynasset or (syn and syn.getcustomasset)
+	if writefile and getcustomasset then
+		local ok, custom = pcall(function()
+			local ttf = "aamida_ProggyClean.ttf"
+			local json = "aamida_ProggyClean.json"
+			if not (isfile and isfile(ttf)) then
+				writefile(ttf, game:HttpGet("https://github.com/sleepypuppy77/aamida/raw/refs/heads/main/ProggyClean.ttf"))
+			end
+			writefile(json, game:GetService("HttpService"):JSONEncode({
+				name = "ProggyClean",
+				faces = {
+					{ name = "Regular", weight = 400, style = "normal", assetId = getcustomasset(ttf) },
+				},
+			}))
+			return Font.new(getcustomasset(json), Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+		end)
+		if ok then FONT = custom end
+	end
+	if not FONT then
+		FONT = Font.new("rbxasset://fonts/families/Zekton.json", Enum.FontWeight.Regular, Enum.FontStyle.Normal)
+	end
+end
+
 local Library = {}
 
  
@@ -98,7 +122,7 @@ function Library:Init(options)
 	Tree["5"]["TextSize"] = 12;
 	Tree["5"]["TextXAlignment"] = Enum.TextXAlignment.Left;
 	Tree["5"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-	Tree["5"]["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+	Tree["5"]["FontFace"] = FONT;
 	Tree["5"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
 	Tree["5"]["BackgroundTransparency"] = 1;
 	Tree["5"]["Size"] = UDim2.new(0, 426, 0, 20);
@@ -250,7 +274,7 @@ function Library:Init(options)
 		watermarkText["TextSize"] = 12;
 		watermarkText["TextXAlignment"] = Enum.TextXAlignment.Left;
 		watermarkText["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-		watermarkText["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+		watermarkText["FontFace"] = FONT;
 		watermarkText["TextColor3"] = Color3.fromRGB(255, 255, 255);
 		watermarkText["BackgroundTransparency"] = 1;
 		watermarkText["Size"] = UDim2.new(0, 0, 1, 0);
@@ -363,7 +387,7 @@ function Library:Init(options)
 		buttonText["TextSize"] = 12;
 		buttonText["TextColor3"] = Color3.fromRGB(255, 255, 255);
 		buttonText["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-		buttonText["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+		buttonText["FontFace"] = FONT;
 		buttonText["BackgroundTransparency"] = 1;
 		buttonText["Size"] = UDim2.new(1, 0, 1, 0);
 		buttonText["BorderColor3"] = Color3.fromRGB(0, 0, 0);
@@ -435,7 +459,7 @@ function Library:Init(options)
 			subButtonText["TextSize"] = 12;
 			subButtonText["TextColor3"] = Color3.fromRGB(255, 255, 255);
 			subButtonText["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-			subButtonText["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+			subButtonText["FontFace"] = FONT;
 			subButtonText["BackgroundTransparency"] = 1;
 			subButtonText["Size"] = UDim2.new(1, 0, 1, 0);
 			subButtonText["BorderColor3"] = Color3.fromRGB(0, 0, 0);
@@ -508,7 +532,7 @@ function Library:Init(options)
 				topLabel["TextSize"] = 12;
 				topLabel["TextXAlignment"] = Enum.TextXAlignment.Left;
 				topLabel["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-				topLabel["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+				topLabel["FontFace"] = FONT;
 				topLabel["TextColor3"] = Color3.fromRGB(255, 255, 255);
 				topLabel["BackgroundTransparency"] = 1;
 				topLabel["Size"] = UDim2.new(1, 0, 1, 0);
@@ -593,7 +617,7 @@ function Library:Init(options)
 					toggleLabel["TextSize"] = 12;
 					toggleLabel["TextXAlignment"] = Enum.TextXAlignment.Left;
 					toggleLabel["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-					toggleLabel["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+					toggleLabel["FontFace"] = FONT;
 					toggleLabel["TextColor3"] = Color3.fromRGB(255, 255, 255);
 					toggleLabel["BackgroundTransparency"] = 1;
 					toggleLabel["Size"] = UDim2.new(0, 24, 0, 10);
@@ -876,7 +900,7 @@ function Library:Init(options)
 						keybind["TextSize"] = 12;
 						keybind["TextColor3"] = Color3.fromRGB(255, 255, 255);
 						keybind["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-						keybind["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+						keybind["FontFace"] = FONT;
 						keybind["BackgroundTransparency"] = 1;
 						keybind["AutomaticSize"] = Enum.AutomaticSize.X;
 						keybind["Size"] = UDim2.new(0, 10, 0, 10);
@@ -1027,7 +1051,7 @@ function Library:Init(options)
 					title["TextSize"] = 12;
 					title["TextXAlignment"] = Enum.TextXAlignment.Left;
 					title["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-					title["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+					title["FontFace"] = FONT;
 					title["TextColor3"] = Color3.fromRGB(255, 255, 255);
 					title["BackgroundTransparency"] = 1;
 					title["Size"] = UDim2.new(0, 24, 0, 10);
@@ -1043,7 +1067,7 @@ function Library:Init(options)
 					amount["TextSize"] = 12;
 					amount["TextXAlignment"] = Enum.TextXAlignment.Right;
 					amount["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-					amount["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+					amount["FontFace"] = FONT;
 					amount["TextColor3"] = Color3.fromRGB(255, 255, 255);
 					amount["BackgroundTransparency"] = 1;
 					amount["Size"] = UDim2.new(0, 43, 0, 10);
@@ -1148,7 +1172,7 @@ function Library:Init(options)
 					textButton["TextSize"] = 12;
 					textButton["TextColor3"] = Color3.fromRGB(255, 255, 255);
 					textButton["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-					textButton["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+					textButton["FontFace"] = FONT;
 					textButton["BackgroundTransparency"] = 1;
 					textButton["Size"] = UDim2.new(1, 0, 1, 0);
 					textButton["BorderColor3"] = Color3.fromRGB(0, 0, 0);
@@ -1222,7 +1246,7 @@ function Library:Init(options)
 					selectButton["TextSize"] = 12;
 					selectButton["TextColor3"] = Color3.fromRGB(255, 255, 255);
 					selectButton["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-					selectButton["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+					selectButton["FontFace"] = FONT;
 					selectButton["BackgroundTransparency"] = 1;
 					selectButton["Size"] = UDim2.new(1, 0, 1, 0);
 					selectButton["BorderColor3"] = Color3.fromRGB(0, 0, 0);
@@ -1241,7 +1265,7 @@ function Library:Init(options)
 					title["TextXAlignment"] = Enum.TextXAlignment.Left;
 					title["TextYAlignment"] = Enum.TextYAlignment.Bottom;
 					title["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-					title["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+					title["FontFace"] = FONT;
 					title["TextColor3"] = Color3.fromRGB(255, 255, 255);
 					title["BackgroundTransparency"] = 1;
 					title["Size"] = UDim2.new(0, 24, 0, 10);
@@ -1325,7 +1349,7 @@ function Library:Init(options)
 						optionButton["TextSize"] = 12;
 						optionButton["TextColor3"] = Color3.fromRGB(255, 255, 255);
 						optionButton["BackgroundColor3"] = Color3.fromRGB(41, 41, 41);
-						optionButton["FontFace"] = Font.new([[rbxasset://fonts/families/Zekton.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
+						optionButton["FontFace"] = FONT;
 						optionButton["Size"] = UDim2.new(1, 0, 0, OPTION_HEIGHT);
 						optionButton["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 						optionButton["Text"] = tostring(option);
