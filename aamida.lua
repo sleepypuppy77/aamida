@@ -367,6 +367,107 @@ function Library:Init(options)
 		return watermarkObj
 	end
 
+	-- notifications: slide in from the left, stack, and line up under the watermark
+	local notifications = {}	-- active list, index 1 = top (newest)
+	local NOTIF_HEIGHT = 20
+	local NOTIF_GAP = 6
+	local NOTIF_OFFSCREEN = -500
+	local NOTIF_TWEEN = TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+
+	local function notifAnchor()
+		local inset = guiService:GetGuiInset()
+		local topY = (inset.Y > 0 and inset.Y or 58)
+		-- inset.X + 16 lines up with the watermark; sit on the row just below it
+		return inset.X + 16, topY + 4 + NOTIF_HEIGHT + NOTIF_GAP
+	end
+
+	local function reflowNotifications()
+		local x, y = notifAnchor()
+		for i, entry in ipairs(notifications) do
+			local targetY = y + (i - 1) * (NOTIF_HEIGHT + NOTIF_GAP)
+			tweenService:Create(entry.Frame, NOTIF_TWEEN, { Position = UDim2.fromOffset(x, targetY) }):Play()
+		end
+	end
+
+	function Tree:Notify(notifyOptions)
+		notifyOptions = Library:validate({
+			text = "Notification",
+			duration = 3,
+			color = Color3.fromRGB(151, 201, 61),	-- accent colour
+		}, notifyOptions or {})
+
+		local _, y = notifAnchor()
+
+		-- notification frame (same styling as the watermark)
+		local notif = Instance.new("Frame", Tree["1"]);
+		notif["BorderSizePixel"] = 0;
+		notif["BackgroundColor3"] = Color3.fromRGB(41, 41, 41);
+		notif["Size"] = UDim2.new(0, 0, 0, NOTIF_HEIGHT);
+		notif["AutomaticSize"] = Enum.AutomaticSize.X;
+		notif["Position"] = UDim2.fromOffset(NOTIF_OFFSCREEN, y);	-- start off-screen left
+		notif["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+		notif["Name"] = [[Notification]];
+
+		local notifStroke = Instance.new("UIStroke", notif);
+		notifStroke["LineJoinMode"] = Enum.LineJoinMode.Miter;
+
+		local notifGradient = Instance.new("UIGradient", notif);
+		notifGradient["Rotation"] = 90;
+		notifGradient["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(168, 168, 168))};
+
+		local notifPadding = Instance.new("UIPadding", notif);
+		notifPadding["PaddingLeft"] = UDim.new(0, 6);
+		notifPadding["PaddingRight"] = UDim.new(0, 6);
+
+		local notifText = Instance.new("TextLabel", notif);
+		notifText["TextStrokeTransparency"] = 0;
+		notifText["BorderSizePixel"] = 0;
+		notifText["TextSize"] = 12;
+		notifText["TextXAlignment"] = Enum.TextXAlignment.Left;
+		notifText["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+		notifText["FontFace"] = FONT;
+		notifText["TextColor3"] = Color3.fromRGB(255, 255, 255);
+		notifText["BackgroundTransparency"] = 1;
+		notifText["Size"] = UDim2.new(0, 0, 1, 0);
+		notifText["AutomaticSize"] = Enum.AutomaticSize.X;
+		notifText["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+		notifText["Text"] = notifyOptions["text"];
+		notifText["Name"] = [[Text]];
+
+		local notifAccent = Instance.new("Frame", notif);
+		notifAccent["BorderSizePixel"] = 0;
+		notifAccent["BackgroundColor3"] = notifyOptions["color"];
+		notifAccent["AnchorPoint"] = Vector2.new(0, 1);
+		notifAccent["Position"] = UDim2.new(0, -6, 1, 0);
+		notifAccent["Size"] = UDim2.new(1, 12, 0, 1);
+		notifAccent["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+		notifAccent["Name"] = [[Accent]];
+
+		local notifAccentGradient = Instance.new("UIGradient", notifAccent);
+		notifAccentGradient["Rotation"] = 90;
+		notifAccentGradient["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(168, 168, 168))};
+
+		local entry = { Frame = notif }
+		table.insert(notifications, 1, entry)	-- newest on top
+		reflowNotifications()	-- slides the new one in + pushes the rest down
+
+		-- auto-dismiss: slide back out, then remove and reflow
+		task.delay(notifyOptions["duration"], function()
+			tweenService:Create(notif, NOTIF_TWEEN, { Position = UDim2.fromOffset(NOTIF_OFFSCREEN, notif.Position.Y.Offset) }):Play()
+			task.wait(NOTIF_TWEEN.Time)
+			for i, e in ipairs(notifications) do
+				if e == entry then
+					table.remove(notifications, i)
+					break
+				end
+			end
+			notif:Destroy()
+			reflowNotifications()
+		end)
+
+		return entry
+	end
+
 	-- swap animation config
 	local SELECTED_COLOR = Color3.fromRGB(41, 41, 41)
 	local IDLE_COLOR = Color3.fromRGB(61, 61, 61)
