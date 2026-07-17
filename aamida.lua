@@ -397,6 +397,7 @@ function Library:Init(options)
 		}, notifyOptions or {})
 
 		local _, y = notifAnchor()
+		local startY = y + #notifications * (NOTIF_HEIGHT + NOTIF_GAP)	-- its row at the bottom of the stack
 
 		-- notification frame (same styling as the watermark)
 		local notif = Instance.new("Frame", Tree["1"]);
@@ -404,7 +405,7 @@ function Library:Init(options)
 		notif["BackgroundColor3"] = Color3.fromRGB(41, 41, 41);
 		notif["Size"] = UDim2.new(0, 0, 0, NOTIF_HEIGHT);
 		notif["AutomaticSize"] = Enum.AutomaticSize.X;
-		notif["Position"] = UDim2.fromOffset(NOTIF_OFFSCREEN, y);	-- start off-screen left
+		notif["Position"] = UDim2.fromOffset(NOTIF_OFFSCREEN, startY);	-- start off-screen at its own row
 		notif["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 		notif["Name"] = [[Notification]];
 
@@ -448,8 +449,13 @@ function Library:Init(options)
 		notifAccentGradient["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(168, 168, 168))};
 
 		local entry = { Frame = notif }
-		table.insert(notifications, 1, entry)	-- newest on top
-		reflowNotifications()	-- slides the new one in + pushes the rest down
+		table.insert(notifications, entry)	-- newest at the bottom of the stack
+		reflowNotifications()	-- slides the new one in at the bottom
+
+		-- the accent line doubles as a countdown bar: deplete its width over the duration
+		tweenService:Create(notifAccent, TweenInfo.new(notifyOptions["duration"], Enum.EasingStyle.Linear), {
+			Size = UDim2.new(0, 0, 0, 1),
+		}):Play()
 
 		-- auto-dismiss: slide back out, then remove and reflow
 		task.delay(notifyOptions["duration"], function()
