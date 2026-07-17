@@ -1,5 +1,5 @@
 local players = game:GetService("Players")
-local tweenService = game:GetService("TweenService")
+local tweenService = game:GetService("TweenService")	
 local userInputService = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 local coreGui = game:GetService("CoreGui")
@@ -250,7 +250,7 @@ function Library:Init(options)
 		watermark["BackgroundColor3"] = Color3.fromRGB(41, 41, 41);
 		watermark["Size"] = UDim2.new(0, 0, 0, 20);
 		watermark["AutomaticSize"] = Enum.AutomaticSize.X;
-		watermark["Position"] = UDim2.fromOffset(8, 58);	-- fallback; corrected to the real inset below
+		watermark["Position"] = UDim2.fromOffset(16, 58);	-- fallback; corrected to the real inset below
 		watermark["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 		watermark["Name"] = [[Watermark]];
 
@@ -307,7 +307,8 @@ function Library:Init(options)
 			if moved then return end
 			local inset = guiService:GetGuiInset()
 			if inset.Y > 0 then
-				watermark.Position = UDim2.fromOffset(8, inset.Y + 4)
+				-- inset.X handles any left safe-area (notch); +16 matches the topbar's left button margin
+				watermark.Position = UDim2.fromOffset(inset.X + 16, inset.Y + 4)
 			end
 		end
 		anchorBelowTopbar()
