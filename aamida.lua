@@ -1399,6 +1399,111 @@ function Library:Init(options)
 					return dropdownObj
 				end
 
+				function sectionObj:CreateKeybind(keybindOptions)
+					keybindOptions = Library:validate({
+						name = "Keybind",
+						default = false,	-- a key string like "e", or false for unbound
+						callback = function() end,
+					}, keybindOptions or {})
+
+					-- row (same label-left / control-right layout as the Toggle)
+					local row = Instance.new("Frame", container);
+					row["BorderSizePixel"] = 0;
+					row["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+					row["Size"] = UDim2.new(1, 0, 0, 10);
+					row["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+					row["Name"] = [[Keybind]];
+					row["BackgroundTransparency"] = 1;
+
+					local rowLayout = Instance.new("UIListLayout", row);
+					rowLayout["SortOrder"] = Enum.SortOrder.LayoutOrder;
+					rowLayout["FillDirection"] = Enum.FillDirection.Horizontal;
+					rowLayout["HorizontalFlex"] = Enum.UIFlexAlignment.SpaceBetween;
+					rowLayout["VerticalAlignment"] = Enum.VerticalAlignment.Center;
+
+					local label = Instance.new("TextLabel", row);
+					label["TextStrokeTransparency"] = 0;
+					label["BorderSizePixel"] = 0;
+					label["TextSize"] = 12;
+					label["TextXAlignment"] = Enum.TextXAlignment.Left;
+					label["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+					label["FontFace"] = FONT;
+					label["TextColor3"] = Color3.fromRGB(255, 255, 255);
+					label["BackgroundTransparency"] = 1;
+					label["Size"] = UDim2.new(0, 24, 0, 10);
+					label["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+					label["Text"] = keybindOptions["name"];
+					label["AutomaticSize"] = Enum.AutomaticSize.X;
+
+					local button = Instance.new("TextButton", row);
+					button["TextStrokeTransparency"] = 0;
+					button["BorderSizePixel"] = 0;
+					button["TextSize"] = 12;
+					button["TextColor3"] = Color3.fromRGB(255, 255, 255);
+					button["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
+					button["FontFace"] = FONT;
+					button["BackgroundTransparency"] = 1;
+					button["AutomaticSize"] = Enum.AutomaticSize.X;
+					button["Size"] = UDim2.new(0, 10, 0, 10);
+					button["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+					button["Text"] = "[ ]";
+					button["Name"] = [[Keybind]];
+
+					local keybindObj = {
+						Name = keybindOptions["name"],
+						Value = nil,
+						Frame = row,
+						Button = button,
+					}
+
+					local boundKey = nil
+					if type(keybindOptions["default"]) == "string" then
+						local ok, code = pcall(function() return Enum.KeyCode[string.upper(keybindOptions["default"])] end)
+						if ok then boundKey = code end
+					end
+
+					local listening = false
+					local function render()
+						if listening then
+							button.Text = "[...]"
+						elseif boundKey then
+							button.Text = "[" .. boundKey.Name .. "]"
+						else
+							button.Text = "[ ]"
+						end
+						keybindObj.Value = boundKey
+					end
+					render()
+
+					button.MouseButton1Click:Connect(function()
+						listening = true
+						render()
+					end)
+
+					userInputService.InputBegan:Connect(function(input, gameProcessed)
+						if listening then
+							if input.UserInputType == Enum.UserInputType.Keyboard then
+								-- Escape / Backspace clears the bind
+								if input.KeyCode == Enum.KeyCode.Escape or input.KeyCode == Enum.KeyCode.Backspace then
+									boundKey = nil
+								else
+									boundKey = input.KeyCode
+								end
+								listening = false
+								render()
+							end
+							return
+						end
+
+						if gameProcessed then return end
+						if boundKey and input.KeyCode == boundKey then
+							keybindOptions["callback"]()
+						end
+					end)
+
+					return keybindObj
+				end
+
 				table.insert(subtab.Sections, sectionObj)
 
 				return sectionObj
