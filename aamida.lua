@@ -3,6 +3,7 @@ local tweenService = game:GetService("TweenService")
 local userInputService = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
 local coreGui = game:GetService("CoreGui")
+local guiService = game:GetService("GuiService")
 
 local viewport = workspace.CurrentCamera.ViewportSize
 
@@ -249,7 +250,7 @@ function Library:Init(options)
 		watermark["BackgroundColor3"] = Color3.fromRGB(41, 41, 41);
 		watermark["Size"] = UDim2.new(0, 0, 0, 20);
 		watermark["AutomaticSize"] = Enum.AutomaticSize.X;
-		watermark["Position"] = UDim2.fromOffset(8, 40);	-- below the Roblox topbar (logo / chat)
+		watermark["Position"] = UDim2.fromOffset(8, 58);	-- fallback; corrected to the real inset below
 		watermark["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 		watermark["Name"] = [[Watermark]];
 
@@ -298,6 +299,20 @@ function Library:Init(options)
 		watermarkAccentGradient["Rotation"] = 90;
 		watermarkAccentGradient["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(168, 168, 168))};
 
+		-- anchor just below the Roblox topbar using the real inset (58px new topbar, 36px old).
+		-- IgnoreGuiInset is true so we offset manually; GetGuiInset can be 0 on the first frame,
+		-- so we only apply it once it's populated and re-check when TopbarInset changes.
+		local moved = false
+		local function anchorBelowTopbar()
+			if moved then return end
+			local inset = guiService:GetGuiInset()
+			if inset.Y > 0 then
+				watermark.Position = UDim2.fromOffset(8, inset.Y + 4)
+			end
+		end
+		anchorBelowTopbar()
+		guiService:GetPropertyChangedSignal("TopbarInset"):Connect(anchorBelowTopbar)
+
 		-- draggable, same as the Window
 		do
 			local dragging = false
@@ -306,6 +321,7 @@ function Library:Init(options)
 			watermark.InputBegan:Connect(function(input)
 				if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 					dragging = true
+					moved = true	-- stop auto-anchoring once the user drags it
 					dragStart = input.Position
 					startPos = watermark.Position
 				end
