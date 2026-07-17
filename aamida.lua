@@ -289,8 +289,8 @@ function Library:Init(options)
 		watermarkAccent["BorderSizePixel"] = 0;
 		watermarkAccent["BackgroundColor3"] = Color3.fromRGB(151, 201, 61);
 		watermarkAccent["AnchorPoint"] = Vector2.new(0, 1);
-		watermarkAccent["Position"] = UDim2.new(0, 0, 1, 0);
-		watermarkAccent["Size"] = UDim2.new(1, 0, 0, 1);
+		watermarkAccent["Position"] = UDim2.new(0, -6, 1, 0);	-- cancel the left padding
+		watermarkAccent["Size"] = UDim2.new(1, 12, 0, 1);		-- +12 spans both padded edges, full width
 		watermarkAccent["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 		watermarkAccent["Name"] = [[Accent]];
 
