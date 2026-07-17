@@ -352,6 +352,18 @@ function Library:Init(options)
 			watermarkText.Text = newText
 		end
 
+		-- smooth fade-in entrance (Frame can't group-fade, so we ease each part's transparency)
+		local ENTER_TWEEN = TweenInfo.new(0.6, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
+		watermark.BackgroundTransparency = 1
+		watermarkStroke.Transparency = 1
+		watermarkText.TextTransparency = 1
+		watermarkText.TextStrokeTransparency = 1
+		watermarkAccent.BackgroundTransparency = 1
+		tweenService:Create(watermark, ENTER_TWEEN, { BackgroundTransparency = 0 }):Play()
+		tweenService:Create(watermarkStroke, ENTER_TWEEN, { Transparency = 0 }):Play()
+		tweenService:Create(watermarkText, ENTER_TWEEN, { TextTransparency = 0, TextStrokeTransparency = 0 }):Play()
+		tweenService:Create(watermarkAccent, ENTER_TWEEN, { BackgroundTransparency = 0 }):Play()
+
 		return watermarkObj
 	end
 
