@@ -249,7 +249,7 @@ function Library:Init(options)
 		watermark["BackgroundColor3"] = Color3.fromRGB(41, 41, 41);
 		watermark["Size"] = UDim2.new(0, 0, 0, 20);
 		watermark["AutomaticSize"] = Enum.AutomaticSize.X;
-		watermark["Position"] = UDim2.fromOffset(8, 8);
+		watermark["Position"] = UDim2.fromOffset(8, 40);	-- below the Roblox topbar (logo / chat)
 		watermark["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 		watermark["Name"] = [[Watermark]];
 
@@ -282,6 +282,21 @@ function Library:Init(options)
 		watermarkText["BorderColor3"] = Color3.fromRGB(0, 0, 0);
 		watermarkText["Text"] = watermarkOptions["text"];
 		watermarkText["Name"] = [[Text]];
+
+		-- Watermark.Accent (green underline, same accent colour as the slider fill)
+		local watermarkAccent = Instance.new("Frame", watermark);
+		watermarkAccent["BorderSizePixel"] = 0;
+		watermarkAccent["BackgroundColor3"] = Color3.fromRGB(151, 201, 61);
+		watermarkAccent["AnchorPoint"] = Vector2.new(0, 1);
+		watermarkAccent["Position"] = UDim2.new(0, 0, 1, 0);
+		watermarkAccent["Size"] = UDim2.new(1, 0, 0, 1);
+		watermarkAccent["BorderColor3"] = Color3.fromRGB(0, 0, 0);
+		watermarkAccent["Name"] = [[Accent]];
+
+		-- Watermark.Accent.UIGradient
+		local watermarkAccentGradient = Instance.new("UIGradient", watermarkAccent);
+		watermarkAccentGradient["Rotation"] = 90;
+		watermarkAccentGradient["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 255, 255)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(168, 168, 168))};
 
 		-- draggable, same as the Window
 		do
